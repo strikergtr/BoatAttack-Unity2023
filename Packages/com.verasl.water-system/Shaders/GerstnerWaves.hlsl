@@ -5,11 +5,11 @@ uniform uint 	_WaveCount; // how many waves, set via the water component
 
 struct Wave
 {
-	float amplitude;
-	float direction;
-	float wavelength;
-	float2 origin;
-	float omni;
+	half amplitude;
+	half direction;
+	half wavelength;
+	half2 origin;
+	half omni;
 };
 
 #if defined(USE_STRUCTURED_BUFFER)
@@ -27,7 +27,7 @@ struct WaveStruct
 WaveStruct GerstnerWave(half2 pos, float waveCountMulti, half amplitude, half direction, half wavelength, half omni, half2 omniPos)
 {
 	WaveStruct waveOut;
-#if defined(_STATIC_SHADER)
+#if defined(_STATIC_WATER)
 	float time = 0;
 #else
 	float time = _Time.y;

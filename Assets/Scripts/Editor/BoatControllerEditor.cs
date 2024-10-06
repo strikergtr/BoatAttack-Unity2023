@@ -61,6 +61,7 @@ namespace BoatAttack
                 }
                 EditorGUILayout.EndVertical();
 
+
                 EditorGUI.indentLevel--;
             }
             EditorGUILayout.EndFoldoutHeaderGroup();

@@ -68,16 +68,7 @@ float2 AdjustedDepth(half2 uvs, half4 additionalData)
 {
 	float rawD = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_ScreenTextures_linear_clamp, uvs);
 	float d = LinearEyeDepth(rawD, _ZBufferParams);
-
-	// TODO: Changing the usage of UNITY_REVERSED_Z this way to fix testing, but I'm not sure the original code is correct anyway.
-	// In OpenGL, rawD should already have be remmapped before converting depth to linear eye depth.
-#if UNITY_REVERSED_Z
-	float offset = 0;
-#else
-	float offset = 1;
-#endif
-	
- 	return float2(d * additionalData.x - additionalData.y, (rawD * -_ProjectionParams.x) + offset);
+	return float2(d * additionalData.x - additionalData.y, (rawD * -_ProjectionParams.x) + (1-UNITY_REVERSED_Z));
 }
 
 float WaterTextureDepth(float3 posWS)
@@ -121,7 +112,7 @@ half4 AdditionalData(float3 postionWS, WaveStruct wave)
 
 WaterVertexOutput WaveVertexOperations(WaterVertexOutput input)
 {
-#ifdef _STATIC_SHADER
+#if defined(_STATIC_WATER)
 	float time = 0;
 #else
 	float time = _Time.y;
@@ -252,7 +243,7 @@ half4 WaterFragment(WaterVertexOutput IN) : SV_Target
     BRDFData brdfData;
     half alpha = 1;
     InitializeBRDFData(half3(0, 0, 0), 0, half3(1, 1, 1), 0.95, alpha, brdfData);
-	half3 spec = DirectBDRF(brdfData, IN.normal, mainLight.direction, IN.viewDir) * shadow * mainLight.color;
+	half3 spec = DirectBDRF(brdfData, IN.normal, mainLight.direction, IN.viewDir, false) * shadow * mainLight.color;
 #ifdef _ADDITIONAL_LIGHTS
     uint pixelLightCount = GetAdditionalLightsCount();
     for (uint lightIndex = 0u; lightIndex < pixelLightCount; ++lightIndex)

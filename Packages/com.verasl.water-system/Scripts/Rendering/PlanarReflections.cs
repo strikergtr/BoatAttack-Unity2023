@@ -221,8 +221,8 @@ namespace UnityEngine.Rendering.Universal
             if (_reflectionTexture == null)
             {
                 var res = ReflectionResolution(cam, UniversalRenderPipeline.asset.renderScale);
-                bool useHdr10 = RenderingUtils.SupportsRenderTextureFormat(RenderTextureFormat.RGB111110Float);
-                RenderTextureFormat hdrFormat = useHdr10 ? RenderTextureFormat.RGB111110Float : RenderTextureFormat.DefaultHDR;
+                const bool useHdr10 = true;
+                const RenderTextureFormat hdrFormat = useHdr10 ? RenderTextureFormat.RGB111110Float : RenderTextureFormat.DefaultHDR;
                 _reflectionTexture = RenderTexture.GetTemporary(res.x, res.y, 16,
                     GraphicsFormatUtility.GetGraphicsFormat(hdrFormat, true));
             }
@@ -247,15 +247,12 @@ namespace UnityEngine.Rendering.Universal
 
             var data = new PlanarReflectionSettingData(); // save quality settings and lower them for the planar reflections
             data.Set(); // set quality settings
-            
-            Shader.EnableKeyword("_PLANAR_REFLECTION_CAMERA");
 
             BeginPlanarReflections?.Invoke(context, _reflectionCamera); // callback Action for PlanarReflection
             UniversalRenderPipeline.RenderSingleCamera(context, _reflectionCamera); // render planar reflections
 
             data.Restore(); // restore the quality settings
             Shader.SetGlobalTexture(_planarReflectionTextureId, _reflectionTexture); // Assign texture to water shader
-            Shader.DisableKeyword("_PLANAR_REFLECTION_CAMERA");
         }
 
         class PlanarReflectionSettingData

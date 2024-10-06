@@ -55,7 +55,7 @@ public class BenchmarkWindow : EditorWindow
         assetGUID = EditorPrefs.GetString(assetGuidKey);
         if (assetGUID == "")
             assetGUID = AssetDatabase.GUIDFromAssetPath("Assets/resources/benchmarksettings.asset").ToString();
-
+        
         _benchConfigData = AssetDatabase.LoadAssetAtPath<BenchmarkConfigData>(AssetDatabase.GUIDToAssetPath(assetGUID));
     }
 
@@ -227,13 +227,15 @@ public class BenchmarkWindow : EditorWindow
         options.locationPathName = $"Builds/Benchmark/{target:G}/BoatattackBenchmark{ext}";
         options.target = target;
         options.targetGroup = BuildPipeline.GetBuildTargetGroup(target);
-        options.options |= (BuildOptions.Development | BuildOptions.AutoRunPlayer);
+        options.options = BuildOptions.Development;
+        options.options = BuildOptions.AutoRunPlayer;
 
         var curTar = EditorUserBuildSettings.activeBuildTarget;
         if (target != curTar)
         {
             EditorUserBuildSettings.SwitchActiveBuildTarget(options.targetGroup, options.target);
         }
+        AutoBuildAddressables.Popup();
         var report = BuildPipeline.BuildPlayer(options);
         var summary = report.summary;
 

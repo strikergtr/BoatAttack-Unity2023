@@ -94,8 +94,6 @@ namespace BoatAttack
         
         private void Awake()
         {
-            if(Debug.isDebugBuild)
-                Debug.Log("RaceManager Loaded");
             Instance = this;
         }
 

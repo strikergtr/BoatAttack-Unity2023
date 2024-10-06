@@ -53,9 +53,7 @@ namespace BoatAttack
                     _smoothPositions[i].y += Time.deltaTime;
                 else
                     _smoothPositions[i].y -= Time.deltaTime * 0.25f;
-#if !STATIC_EVERYTHING
                 surfers[i].position = _smoothPositions[i];
-#endif
             }
         }
     }

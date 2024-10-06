@@ -38,7 +38,8 @@ public class PerfomanceStats : MonoBehaviour
     public void StartRun(string benchmarkName, int runLength)
     {
 	    Stats = new PerfBasic(benchmarkName, Benchmark.UrpVersion, runLength);
-	    CreateTextGui();
+	    if(frametimeDisplay == null)
+			CreateTextGui();
     }
 
     private void Update ()
@@ -149,7 +150,6 @@ public class PerfomanceStats : MonoBehaviour
 
 	private void CreateTextGui()
 	{
-		if (frametimeDisplay != null) return;
 		var textGo = new GameObject("perfText", typeof(TextMeshProUGUI));
 		textGo.transform.SetParent(AppSettings.ConsoleCanvas.transform, true);
 

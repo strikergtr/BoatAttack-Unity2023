@@ -41,15 +41,8 @@ namespace BoatAttack
         private static readonly int LiveryPrimary = Shader.PropertyToID("_Color1");
         private static readonly int LiveryTrim = Shader.PropertyToID("_Color2");
 
-        // debug
-        [SerializeField] internal bool debugControl = false;
-
         private void Awake()
 		{
-            if (debugControl)
-            {
-                Setup(1, true, RandomLivery());
-            }
             _spawnPosition = transform.localToWorldMatrix;
             TryGetComponent(out engine.RB);
         }
@@ -80,15 +73,12 @@ namespace BoatAttack
 
         private void Update()
         {
-            if (RaceManager.RaceStarted)
-            {
-                UpdateLaps();
+            UpdateLaps();
 
-                if (RaceUi)
-                {
-                    RaceUi.UpdatePlaceCounter(Place);
-                    RaceUi.UpdateSpeed(engine.VelocityMag);
-                }
+            if (RaceUi)
+            {
+                RaceUi.UpdatePlaceCounter(Place);
+                RaceUi.UpdateSpeed(engine.VelocityMag);
             }
         }
 
@@ -105,24 +95,20 @@ namespace BoatAttack
         {
             if (!RaceManager.RaceStarted)
             {
-                if(WaypointGroup.Instance) AlignBoatWithStartingLine();
+                // race not started, make sure to keep boat fairly aligned.
+                var target = WaypointGroup.Instance.StartingPositions[_playerIndex];
+                Vector3 targetPosition = target.GetColumn(3);
+                Vector3 targetForward = target.GetColumn(2);
+                var t = transform;
+                var currentPosition = t.position;
+                var currentForward = t.forward;
+
+                targetPosition.y = currentPosition.y;
+                engine.RB.AddForce((currentPosition - targetPosition) * 0.25f);
+
+                engine.RB.MoveRotation(Quaternion.LookRotation(Vector3.Slerp(currentForward, targetForward, 0.1f * Time.fixedDeltaTime)));
+
             }
-        }
-
-        private void AlignBoatWithStartingLine()
-        {
-            // race not started, make sure to keep boat fairly aligned.
-            var target = WaypointGroup.Instance.StartingPositions[_playerIndex];
-            Vector3 targetPosition = target.GetColumn(3);
-            Vector3 targetForward = target.GetColumn(2);
-            var t = transform;
-            var currentPosition = t.position;
-            var currentForward = t.forward;
-
-            targetPosition.y = currentPosition.y;
-            engine.RB.AddForce((currentPosition - targetPosition) * 0.25f);
-
-            engine.RB.MoveRotation(Quaternion.LookRotation(Vector3.Slerp(currentForward, targetForward, 0.1f * Time.fixedDeltaTime)));
         }
 
         private void UpdateLaps()
@@ -176,15 +162,15 @@ namespace BoatAttack
         [ContextMenu("Randomize")]
         private void ColorizeInvoke()
         {
-            Colorize(RandomLivery());
+            Colorize(Color.black, Color.black, true);
         }
 
-        private void Colorize(Color primaryColor, Color trimColor)
+        private void Colorize(Color primaryColor, Color trimColor, bool random = false)
         {
             var livery = new BoatLivery
             {
-                primaryColor = primaryColor,
-                trimColor = trimColor
+                primaryColor = random ? ConstantData.GetRandomPaletteColor : primaryColor,
+                trimColor = random ? ConstantData.GetRandomPaletteColor : trimColor
             };
             Colorize(livery);
         }
@@ -212,16 +198,6 @@ namespace BoatAttack
                 engine.RB.position = resetPoint;
                 engine.RB.rotation = resetMatrix.rotation;
             }
-        }
-
-        BoatLivery RandomLivery()
-        {
-            var livery = new BoatLivery
-            {
-                primaryColor = ConstantData.GetRandomPaletteColor,
-                trimColor = ConstantData.GetRandomPaletteColor
-            };
-            return livery;
         }
     }
 

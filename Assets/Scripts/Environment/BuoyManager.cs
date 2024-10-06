@@ -62,6 +62,7 @@ public class BuoyManager : MonoBehaviour
         
         for (var i = 0; i < _buoys.Length; i++)
         {
+
             var vec  = _buoys[i].position;
             vec.y = _heights[i].y;
             _buoys[i].position = vec;
